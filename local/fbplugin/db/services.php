@@ -3,11 +3,12 @@
 /**
  * Web service feedback local plugin for external functions and service definitions.
  *
- * @copyright  2014 Alejandro Molina (amolinasalazar@gmail.com)
+ * @copyright  Universidad de Granada. Granada – 2014 
+ * @author     Alejandro Molina (amolinasalazar@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// We defined the web service functions to install.
+// Web Services functions definitions.
 $functions = array(
         'local_fbplugin_get_feedback_questions' => array(
                 'classname'   => 'local_fbplugin_external',
@@ -34,10 +35,10 @@ $functions = array(
         )
 );
 
-// We define the services to install as pre-build services. A pre-build service is not editable by administrator.
+// The pre-build services to install.
 $services = array(
-        'My service 2' => array(
-                'functions' => array ('local_fbplugin_get_feedback_questions','local_fbplugin_get_feedbacks_by_courses','local_fbplugin_complete_feedback'),
+        'Service for fbplugin' => array(
+                'functions' => array ('local_fbplugin_get_feedback_questions','local_fbplugin_get_feedbacks_by_courses','local_fbplugin_complete_feedback', 'core_webservice_get_site_info', 'core_enrol_get_users_courses'),
                 'restrictedusers' => 0,
                 'enabled'=>1,
         )

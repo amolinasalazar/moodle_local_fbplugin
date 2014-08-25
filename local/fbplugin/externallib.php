@@ -1,9 +1,21 @@
 <?php
 
-/**
- *
- * @copyright  2014 Alejandro Molina (amolinasalazar@gmail.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+/*
+	© Universidad de Granada. Granada – 2014
+	© Rosana Montes Soldado y Alejandro Molina Salazar (amolinasalazar@gmail.com). Granada – 2014
+
+    This program is free software: you can redistribute it and/or 
+    modify it under the terms of the GNU General Public License as 
+    published by the Free Software Foundation, either version 3 of 
+    the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses>.
  */
 require_once($CFG->libdir . "/externallib.php");
 
@@ -27,7 +39,7 @@ class local_fbplugin_external extends external_api {
      * if no list is provided all feedbacks that the user can view
      * will be returned.
      *
-     * @param array $courseids the course ids
+     * @param array $courseids The course ids.
      * @return array the feedback details
      */
 	 public static function get_feedbacks_by_courses($courseids = array()) {
@@ -47,17 +59,17 @@ class local_fbplugin_external extends external_api {
         }
 		
 		// Array to store the feedbacks to return.
-        $arrfeedback = array();
+        $arrfeedbacks = array();
 		
 		// Ensure there are courseids to loop through.
         if (!empty($courseids)) {
-            // Go through the courseids and return the forums.
+            // Go through the courseids and return the feedbacks.
             foreach ($courseids as $cid) {
                 // Get the course context.
                 $context = context_course::instance($cid);
                 // Check the user can function in this context.
                 self::validate_context($context);
-                // Get the forums in this course.
+                // Get the feedbacks in this course.
                 if ($feedbacks = $DB->get_records('feedback', array('course' => $cid))) {
                     // Get the modinfo for the course.
                     $modinfo = get_fast_modinfo($cid);
@@ -79,7 +91,7 @@ class local_fbplugin_external extends external_api {
                         list($feedback->intro, $feedback->introformat) = external_format_text($feedback->intro, $feedback->introformat, $context->id, 'mod_feedback', 'intro', 0);
                         // Add the course module id to the object, this information is useful.
                         $feedback->cmid = $cm->id;
-                        // Add the forum to the array to return.
+                        // Add the feedback to the array to return.
                         $arrfeedbacks[$feedback->id] = (array) $feedback;
                     }
                 }
@@ -130,8 +142,8 @@ class local_fbplugin_external extends external_api {
     }
 
     /**
-     * Returns a list of all the questions of a feedback
-	 * @param int $feedbackid feedback id
+     * Returns a list of all the questions of a feedback.
+	 * @param int $feedbackid The feedback id.
      * @return array list of questions
      */
     public static function get_feedback_questions($feedbackid) {
@@ -148,7 +160,6 @@ class local_fbplugin_external extends external_api {
 		
 		//Course context validation
 		$coursecontext = context_course::instance($feedback->course, IGNORE_MISSING);
-
 		try {
 			self::validate_context($coursecontext);
 		} catch (Exception $e) {
@@ -192,7 +203,7 @@ class local_fbplugin_external extends external_api {
 			if (feedback_is_already_submitted($feedback->id, $courseid)) { // Testear: al eliminar este if, la funcion devuelve error cuando el usuario nunca ha completado la encuesta.
 				$select = 'feedback = ? AND userid = ?';
 				$params_select = array($feedback->id, $USER->id);
-				$completedid = $DB->get_records_select('feedback_completed', $select, $params_select, 'id', MUST_EXIST);
+				$completedid = $DB->get_records_select('feedback_completed', $select, $params_select);
 				if(empty($completedid)){
 					continue;
 				}
@@ -238,7 +249,7 @@ class local_fbplugin_external extends external_api {
         return new external_multiple_structure(
             new external_single_structure(
                 array(
-                    'id' => new external_value(PARAM_INT, 'Feedback id'),
+                    'id' => new external_value(PARAM_INT, 'Item id'),
                     'template' => new external_value(PARAM_INT, 'Template id'),
 					'name' => new external_value(PARAM_TEXT, 'Name'),
                     'label' => new external_value(PARAM_TEXT, 'Label'),
@@ -256,7 +267,6 @@ class local_fbplugin_external extends external_api {
         );
     }
 	
-	// El formato de entrada esta pensado para recibir mas de un feedback, pero de momento solo contemplaremos uno
 	/**
      * Returns description of method parameters.
      *
@@ -279,12 +289,8 @@ class local_fbplugin_external extends external_api {
 		);
     }
 
-	
-	// Hacemos uso de 3 funciones internas del modulo (lib.php): feedback_create_values, feedback_save_values, feedback_update_values
-	// repetimos el codigo, cambiando el hecho de recoger los valores en vez desde la web, desde los parametros de la funcion
-
 	/**
-     * Complete a feedback with a sequence of item values
+     * Complete a feedback with a sequence of item values.
 	 * @param array $feedback_values all the values of the items
      * @return array
      */
@@ -297,16 +303,12 @@ class local_fbplugin_external extends external_api {
 
         //Parameter validation
 		$params = self::validate_parameters(self::complete_feedback_parameters(), array('feedbackid' => $feedbackid, 'itemvalues' => $itemvalues));
-        // $params[feedbackid];
-	
-		//$params = self::validate_parameters(self::get_feedback_questions_parameters(), array('feedbackid' => $feedback_values['feedback_values']['feedbackid']));
 			
 		// Retrieve the feedback
 		$feedback = $DB->get_record('feedback', array('id' => $params['feedbackid']), '*', MUST_EXIST);
 		
 		//Course context validation
 		$coursecontext = context_course::instance($feedback->course, IGNORE_MISSING);
-
 		try {
 			self::validate_context($coursecontext);
 		} catch (Exception $e) {
@@ -316,9 +318,9 @@ class local_fbplugin_external extends external_api {
             throw new moodle_exception('errorcoursecontextnotvalid', 'webservice', '', $exceptionparam);
 		}
 		
-		// Create return value 
+		// Create return value
         $modinfo = get_fast_modinfo($feedback->course);
-		$cm = $modinfo->get_instances_of('feedback'); //Course module
+		$cm = $modinfo->get_instances_of('feedback');
 		
 		// Check if this feedback does not exist in the modinfo array, should always be false unless DB is borked.
         if (empty($cm[$feedback->id])) {
@@ -344,80 +346,54 @@ class local_fbplugin_external extends external_api {
 		if($feedback_is_closed){
             throw new moodle_exception('feedback_is_not_open', 'feedback');
         }
-		/*
+		
 		// Check if the feedback is already submitted and is not possible to submit it again.
-		if ($feedback->multiple_submit == 0 ) {
-			if (feedback_is_already_submitted($feedback->id, $courseid)) {
-				throw new moodle_exception('this_feedback_is_already_submitted', 'feedback');
-			}
-		}*/
-		
-		// construir el objeto para pasarselo a la funcion
-		
-		//$completedfeedback = new stdClass();
-		
-		//$completedfeedback = feedback_get_current_completed($feedback->id, false, $feedback->course);
-		
-		//feedback_set_tmp_values($completedfeedback);
-		
-		//feedback_save_tmp_values(objetocompletedfeedback,false,userid);
-		
-		/*if($DB->get_record('feedback_complete', array('id' => $feedback->id), '*', MUST_EXIST);){
-			
-		}
-		*/
-		// En el caso de que YA se hubiera completado el feedback, buscaremos el ID del record completado..
+		// (Cambiamos el orden de ejecución porque queremos realizar la consulta igualmente, ya que la usaremos luego)
 		$select = 'feedback = ? AND userid = ?';
 		$params_select = array($feedback->id, $usrid);
-		$completedid = $DB->get_records_select('feedback_completed', $select, $params_select, 'id', MUST_EXIST);
-		if(empty($completedid)){
+		$completedids = $DB->get_records_select('feedback_completed', $select, $params_select);
+		if(empty($completedids)){
 			$completedid=0;
 		}
-		else{ // Si ya se ha completado, comprobaremos si podemos volver a completarlo
+		else{
 			if ($feedback->multiple_submit == 0 ) {
 				throw new moodle_exception('this_feedback_is_already_submitted', 'feedback');
 			}
+			// $completedids should return only 1 element, if this is not like that, something bad is happening in the DB
+			foreach($completedids as $compid){
+				$completedid = $compid->id;
+			}
 		}
-		
-		$transaction = $DB->start_delegated_transaction();
-/*
-		// Crea una instancia en la tabla feedback_completed y feedback_item_values
-		// tmp es false, ya que guardamos directamente los datos en item_values
-		$newcompletedid = WSfeedback_save_values($USER->id, $feedback, $feedback_values, $completeid, , false);
-		if(!$newcompletedid){
-			throw new moodle_exception('invalidmodule', 'error');
-		}
-*/		
-		
 
-		// FUNCTION feedback_save_values
+		$transaction = $DB->start_delegated_transaction();
+	
+		// 3 internal functions are used of "lib.php": "feedback_create_values", "feedback_save_values" and "feedback_update_values".
+		// They are recoded, taking the values of the params instead of the DOM of the web page.
+
+		// ==FUNCTION== feedback_create_values.
 		
-		// Parametros
-		$tmp = false;
+		// Params
+		$tmp = false; // disabled, the values are saved directly in "feedback_item_values"
 		$tmpstr = $tmp ? 'tmp' : '';
 
-		// Tiempo modificacion encuesta
+		// Time modified
 		$time = time();
-		$timemodified = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
+		// Hours, minutes and seconds added, not included in the original code.
+		$timemodified = mktime(date('H',$time), date('i',$time), date('s',$time), date('m', $time), date('d', $time), date('Y', $time));
 		
-		
-		// Comprueba si esta completado, para crear valores desde cero o actualizarlos
+		// Check if its already completed, to decide about create or just update them.
 		$completed = $DB->get_record('feedback_completed'.$tmpstr, array('id'=>$completedid));
 		
-		
+		// ==FUNCTION== feedback_save_values (modify "feedback_completed" and "feedback_item_values" tables of the DB).
 		if (!$completed) {
-			// Creamos valores desde cero: feedback_create_values
-			//return WSfeedback_create_values($usrid, $feedback, $feedback_values, $timemodified, $tmp);
 			
-
-			// Parametros
+			// Params
 			$guestid = false;
 
-			//$feedbackid = $feedback->id;
 			$anonymous_response = $feedback->anonymous;
 			$courseid = $feedback->course;
 
-			//first we create a new completed record
+			// First we create a new completed record
 			$completed = new stdClass();
 			$completed->feedback           = $feedbackid;
 			$completed->userid             = $usrid;
@@ -425,43 +401,11 @@ class local_fbplugin_external extends external_api {
 			$completed->timemodified       = $timemodified;
 			$completed->anonymous_response = $anonymous_response;
 			
-			// Introducimos el record en la base de datos
+			// The new record is inserted and obtained again.
 			$completedid = $DB->insert_record('feedback_completed'.$tmpstr, $completed);
-
-			// y acto seguido lo reobtenemos de la base de datos
 			$completed = $DB->get_record('feedback_completed'.$tmpstr, array('id'=>$completedid));
-
-			//the keys are in the form like abc_xxx
-			//with explode we make an array with(abc, xxx) and (abc=typ und xxx=itemnr)
-
-			//get the items of the feedback
-			//if (!$allitems = $DB->get_records('feedback_item', array('feedback'=>$completed->feedback))) {
-				//return false;
-			//}
-			
-			//foreach($feedback_values['feedback_values']['item_values'] as $values){
-				//$itemvalue = $values;
-			//}
-			
-			//$itemvalue = $feedback_values['feedback_values']['item_values']['value'];
 			
 			foreach ($params['itemvalues'] as $itemvalue) {
-				
-				//if (!$item->hasvalue) {
-					//continue;
-				//}
-				
-				//get the class of item-typ
-				//$itemobj = feedback_get_item_class($item->typ);
-
-				//$keyname = $item->typ.'_'.$item->id;
-
-				// Recogida de valores CAMBIAR
-				//if ($itemobj->value_is_array()) {
-					//$itemvalue = optional_param_array($keyname, null, $itemobj->value_type());
-				//} else {
-					//$itemvalue = optional_param($keyname, null, $itemobj->value_type());
-				//}
 				
 				//get the class of item-typ
 				$itemobj = feedback_get_item_class($itemvalue['typ']);
@@ -475,47 +419,30 @@ class local_fbplugin_external extends external_api {
 				$value->completed = $completed->id;
 				$value->course_id = $courseid;
 
-				//the kind of values can be absolutely different
-				//so we run create_value directly by the item-class
+				// The kind of values can be absolutely different
+				// so we run create_value directly by the item-class.
 				$value->value = $itemobj->create_value($itemvalue['value']);
 				$DB->insert_record('feedback_value'.$tmpstr, $value);
 			}
 			
 			$newcompletedid = $completed->id;
-	
-			
-			
-			
-		} else { 
-			// Actualizamos los valores: feedback_update_values
-			$completed->timemodified = $timemodified;
-			
 
+		// ==FUNCTION== feedback_update_values (modify "feedback_completed" and "feedback_item_values" tables of the DB).
+		} else { 
+			
+			// Upadte the time modified
+			$completed->timemodified = $timemodified;
+		
 			$courseid = $feedback->course;
 
 			$DB->update_record('feedback_completed'.$tmpstr, $completed);
 			//get the values of this completed
 			$values = $DB->get_records('feedback_value'.$tmpstr, array('completed'=>$completed->id));
 
-			//get the items of the feedback
-			//if (!$allitems = $DB->get_records('feedback_item', array('feedback'=>$completed->feedback))) {
-				//return false;
-			//}
-			// OK
 			foreach ($params['itemvalues'] as $itemvalue) {
-				//if (!$item->hasvalue) {
-					//continue;
-				//}
+
 				//get the class of item-typ
 				$itemobj = feedback_get_item_class($itemvalue['typ']);
-
-				//$keyname = $item->typ.'_'.$item->id;
-
-				//if ($itemobj->value_is_array()) {
-					//$itemvalue = optional_param_array($keyname, null, $itemobj->value_type());
-				//} else {
-					//$itemvalue = optional_param($keyname, null, $itemobj->value_type());
-				//}
 
 				//is the itemvalue set (could be a subset of items because pagebreak)?
 				if (is_null($itemvalue['value'])) {
@@ -550,15 +477,13 @@ class local_fbplugin_external extends external_api {
 			$newcompletedid = $completed->id;
 		}
 		
-
 		$transaction->allow_commit();
 		
 		if(!$newcompletedid){
 			throw new moodle_exception('invalidmodule', 'error');
 		}
 		
-		// Return completed ID
-		return $newcompletedid;
+		return null;
 	}
 	
 	/**
