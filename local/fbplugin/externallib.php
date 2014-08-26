@@ -147,7 +147,6 @@ class local_fbplugin_external extends external_api {
      * @return array list of questions
      */
     public static function get_feedback_questions($feedbackid) {
-
         global $DB, $USER, $CFG;
 		
 		require_once($CFG->dirroot . "/mod/feedback/lib.php");
@@ -199,17 +198,11 @@ class local_fbplugin_external extends external_api {
         }
 		
 		// Check if the feedback is already submitted and is not possible to submit it again.
-		if ($feedback->multiple_submit == 0 ) {
-			if (feedback_is_already_submitted($feedback->id, $courseid)) { // Testear: al eliminar este if, la funcion devuelve error cuando el usuario nunca ha completado la encuesta.
-				$select = 'feedback = ? AND userid = ?';
-				$params_select = array($feedback->id, $USER->id);
-				$completedid = $DB->get_records_select('feedback_completed', $select, $params_select);
-				if(empty($completedid)){
-					continue;
-				}
-				else{				
-					throw new moodle_exception('this_feedback_is_already_submitted', 'feedback');
-				}
+		$select = 'feedback = ? AND userid = ?';
+		$params_select = array($feedback->id, $USER->id);
+		if($completedids = $DB->get_records_select('feedback_completed', $select, $params_select)){
+			if ($feedback->multiple_submit == 0 ) {
+				throw new moodle_exception('this_feedback_is_already_submitted', 'feedback');
 			}
 		}
 		
@@ -348,7 +341,6 @@ class local_fbplugin_external extends external_api {
         }
 		
 		// Check if the feedback is already submitted and is not possible to submit it again.
-		// (Cambiamos el orden de ejecución porque queremos realizar la consulta igualmente, ya que la usaremos luego)
 		$select = 'feedback = ? AND userid = ?';
 		$params_select = array($feedback->id, $usrid);
 		$completedids = $DB->get_records_select('feedback_completed', $select, $params_select);

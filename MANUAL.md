@@ -23,7 +23,7 @@ funcione correctamente y creará un servicio que contenga a las mismas.
 Para ello, copiamos el plugin en la carpeta "local" de nuestra instalación de Moodle, que debe quedar de esta manera: "/local/fbplugin".
 Al ingresar en la web con permisos de administrador, se disparará un aviso en el que debemos aceptar la instalación del nuevo plugin (actualizar base de datos de Moodle) para que realmente surjan los cambios.
 
-Nota: cada vez que se quieran actualizar los ficheros del plugin en Moodle, no bastará con sustituir dichos ficheros, además de deberá de incrementar el número de versión del plugin que se encuentra en "" y un usuario con permisos de administrador deberá permitir dicho cambio accediendo a la web.
+Nota: cada vez que se quieran actualizar los ficheros del plugin en Moodle, no bastará con sustituir dichos ficheros, además de deberá de incrementar el número de versión del plugin que se encuentra en "version.php", aceptando dicho cambio accediendo a la web con una cuenta de usuario con permisos de administrador. También se deberá de volver a asignar un "shortname" al servicio (ver 4º).
 
 4º Configuración del "shortname" del servicio:
 

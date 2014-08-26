@@ -1,6 +1,6 @@
 <?php
 
-$plugin->version  = 2011101297;   // The (date) version of this module + 2 extra digital for daily versions
+$plugin->version  = 2011101300;   // The (date) version of this module + 2 extra digital for daily versions
                                   // This version number is displayed into /admin/forms.php
                                   // TODO: if ever this plugin get branched, the old branch number
                                   // will not be updated to the current date but just incremented. We will
