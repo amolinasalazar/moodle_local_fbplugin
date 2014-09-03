@@ -50,7 +50,7 @@ class local_fbplugin_external extends external_api {
 
         //Parameter validation
         $params = self::validate_parameters(self::get_feedbacks_by_courses_parameters(), array('courseids' => $courseids));
-		
+
 		if (empty($params['courseids'])) {
             // Get all the courses the user can view.
             $courseids = array_keys(enrol_get_my_courses());
@@ -118,7 +118,7 @@ class local_fbplugin_external extends external_api {
 					'email_notification' => new external_value(PARAM_INT, 'Email notification status'),
 					'multiple_submit' => new external_value(PARAM_INT, 'Multiple submit status'),
 					'site_after_submit' => new external_value(PARAM_TEXT, 'Site after submit'),
-					'page_after_submit' => new external_value(PARAM_TEXT, 'Page after submit'),
+					'page_after_submit' => new external_value(PARAM_RAW, 'Page after submit'),
 					'page_after_submitformat' => new external_value(PARAM_INT, 'Page after submit format'),
 					'publish_stats' => new external_value(PARAM_INT, 'Publish stats'),
 					'timeopen' => new external_value(PARAM_INT, 'Time to open'),
