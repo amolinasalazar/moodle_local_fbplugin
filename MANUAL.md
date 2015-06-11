@@ -81,35 +81,3 @@ Más información:
 
 https://docs.moodle.org/25/en/Using_web_services
 https://docs.moodle.org/dev/Creating_a_web_service_client
-4º Configuración del "shortname" del servicio:
-
-En esta versión de Moodle, no existe la asignación de "shortnames" por web. La inserción de este dato debe de ser manual, manipulando directamente la base de datos. En futuras versiones, es posible que la asignación sea más sencilla: https://tracker.moodle.org/browse/MDL-29807
-
-Para asignar un shortname al nuevo servicio instalado con el plugin, se debe acceder a la tabla "mdl_external_services"
-de la base de datos y asignar manualmente un nombre al servicio "Service for fbplugin". La app esta implementada para que funcione con el nombre "wsfbplugin", así que cualquier otro nombre diferente hará que la app no conecte con el plugin instalado.
-
-Nota: modificar la app para cambiar el shortname por defecto es fácil, simplemente hay que modificar la variable global "WS_short_name"
-que se encuentra declarada en el archivo "index.html".
-
-5º Habilitando permisos:
-
-Debemos activar dos permisos necesarios para que los usuarios puedan usar el nuevo servicio.
-
-- Permite la creación de claves de seguridad por los usuarios: moodle/webservice:createtoken
-
-- Permite el uso del protocolo REST: webservice/rest:use
-
-Podemos hacer este paso de varias maneras, pero se recomienda añadir estos permisos al rol "Usuario Identificado" para que cualquier persona con cuenta en Moodle, pueda acceder sin errores a la aplicación (disponga o no de encuestas que completar). Otras posibilidades son la de añadir estos permisos a otros roles como el de "Estudiante" o crear un rol propio que añada estos permisos y asignarlo a los usuarios.
-
-Recomendaciones:
-
-Se recomienda que se habilite HTTPS con un certificado válido, para evitar problemas de seguridad.
-
-Problemas:
-
-Para cualquier problema, contactar con Alejandro Molina Salazar (amolinasalazar@gmail.com).
-
-Más información:
-
-https://docs.moodle.org/25/en/Using_web_services
-https://docs.moodle.org/dev/Creating_a_web_service_client
